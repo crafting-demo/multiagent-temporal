@@ -2,7 +2,7 @@ flowchart TB
     User(["You, in the Agent UI"]) --> TEM["temporal-engineering-manager<br/>agent"]
     TEM -->|"starts DeliverChange,<br/>reports progress"| WF
 
-    subgraph orch ["temporal-em sandbox (pinned)"]
+    subgraph orch ["temporal-orchestrator sandbox (pinned)"]
         WF["DeliverChange workflow<br/>Go worker"]
         Srv[("Temporal server<br/>UI + Postgres")]
         WF --- Srv

@@ -1,6 +1,6 @@
 # Temporal Engineering Manager: workspace runbook
 
-You are in the `dev` workspace of the orchestrator sandbox (`temporal-em`). A
+You are in the `dev` workspace of the orchestrator sandbox (`temporal-orchestrator`). A
 Temporal server runs in this sandbox, and the `worker` daemon runs the
 `DeliverChange` workflow from `~/multiagent-temporal/orchestrator`. The workflow does the delivery:
 
