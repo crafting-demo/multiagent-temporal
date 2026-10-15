@@ -5,7 +5,7 @@
 #   temporal        Temporal server, temporal:7233 inside the sandbox
 #   temporal-ui     Temporal Web UI, published as the temporal-ui endpoint
 #   dev             workspace with this repository checked out; its worker daemon
-#                   runs the DeliverChange workflow (see .sandbox/manifest.yaml)
+#                   runs the DeliverChange workflow
 env:
   - TEMPORAL_ADDRESS=temporal:7233
   - TEMPORAL_NAMESPACE=default
@@ -137,6 +137,16 @@ workspaces:
       - path: multiagent-temporal
         repo:
           git: https://github.com/crafting-demo/multiagent-temporal
+        manifest:
+          overlays:
+            - inline:
+                hooks:
+                  build:
+                    cmd: orchestrator/bin/setup
+                daemons:
+                  worker:
+                    run:
+                      cmd: orchestrator/bin/start-worker
     # The agents work in other sandboxes, which idle detection here can't see,
     # so a running workflow counts as activity.
     probes:

@@ -48,8 +48,13 @@ else
 fi
 
 state() { csx sandbox list 2>/dev/null | awk -v n="$NAME" '$1 == n { print $2 }'; }
+origin() { csx sandbox list 2>/dev/null | awk -v n="$NAME" '$1 == n { print ($3 == "Yes" ? $4 : $3) }'; }
 
 if csx sandbox show "$NAME" >/dev/null 2>&1; then
+  if [[ "$(origin)" != "$NAME" ]]; then
+    echo "sandbox $NAME exists but was not created from the $NAME template; remove or rename it, then re-run" >&2
+    exit 1
+  fi
   [[ "$(state)" == Suspended ]] && csx sandbox resume "$NAME"
   # A previous run may have timed out while the sandbox was still being created.
   for _ in $(seq 120); do [[ "$(state)" == Ready ]] && break; sleep 10; done

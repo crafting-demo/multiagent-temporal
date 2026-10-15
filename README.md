@@ -66,8 +66,7 @@ where it left off.
 | :-- | :-- |
 | `INSTALL.md`, `install.sh` | Install steps the default agent follows, and the script it runs |
 | `agents/temporal-engineering-manager.yaml` | The agent you talk to |
-| `templates/temporal-em.yaml` | The orchestrator sandbox: Temporal server, UI, Postgres, and a workspace with this repo |
-| `.sandbox/manifest.yaml` | Builds the worker and runs it as a daemon in that workspace |
+| `templates/temporal-em.yaml` | The orchestrator sandbox: Temporal server, UI, Postgres, and a workspace that checks out this repo and runs the worker |
 | `orchestrator/` | The Go workflow, activities, prompts, worker, and CLI; `AGENT.md` is the agent's runbook |
 | `docs/` | Diagrams and the [reference](docs/reference.md): CLI, options, signals, and development |
 

@@ -16,7 +16,9 @@ of this repo, pull the latest default branch first so you install current files.
 
 Otherwise:
 
-1. Create a sandbox from this git repository (the URL the user pasted).
+1. Create a sandbox from this git repository (the URL the user pasted), named
+   `multiagent-temporal-install`. Do **not** name it `temporal-em`: the install creates a
+   sandbox with that name.
 2. Target a workspace in that sandbox **immediately**. Do not stop to ask whether to open it.
 3. Hand off to the workspace agent so you can run `cs` and `bash`.
 
