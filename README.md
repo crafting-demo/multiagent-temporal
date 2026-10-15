@@ -5,6 +5,10 @@ An engineering-manager agent that delivers a code change through a durable
 agents verify it locally and on a Kubernetes cluster, and failures go back to the coder
 with QA's evidence. Every step is recorded in Temporal history.
 
+## Demo video
+
+[![Demo video: a change delivered by the Temporal Engineering Manager](docs/demo-thumbnail.png)](docs/demo.mp4)
+
 ## Try it for yourself
 
 **1. Install [Crafting Express](https://github.com/crafting-dev/express).**
