@@ -7,7 +7,7 @@ with QA's evidence. Every step is recorded in Temporal history.
 
 ## Demo video
 
-[![Demo video: a change delivered by the Temporal Engineering Manager](docs/demo-thumbnail.png)](docs/demo.mp4)
+[![Demo video: a change delivered by the Temporal Engineering Manager](docs/demo-thumbnail.png)](https://cdn.jsdelivr.net/gh/crafting-demo/multiagent-temporal@main/docs/demo.mp4)
 
 ## Try it for yourself
 
