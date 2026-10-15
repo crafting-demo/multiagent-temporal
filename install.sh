@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Install (or update) the Temporal Engineering Manager in a Crafting org: the
-# temporal-orchestrator template, the pinned temporal-orchestrator sandbox, and the
+# temporal-orch template, the pinned temporal-orch sandbox, and the
 # temporal-engineering-manager agent.
 #
 # Usage: ./install.sh [--shared] [--org ORG] [--folder FOLDER]
@@ -30,7 +30,7 @@ command -v cs >/dev/null || { echo "the Crafting CLI (cs) is required" >&2; exit
 csx() { cs ${CS_ARGS[@]+"${CS_ARGS[@]}"} "$@"; }
 shared() { echo ${SHARED[@]+"${SHARED[@]}"}; }
 
-NAME=temporal-orchestrator
+NAME=temporal-orch
 AGENT=temporal-engineering-manager
 
 for agent in sample-software-engineer sample-qa-engineer; do

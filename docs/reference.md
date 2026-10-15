@@ -6,7 +6,7 @@ The agent drives everything below; you can run the same commands yourself in the
 orchestrator workspace.
 
 ```bash
-cs ssh -W temporal-orchestrator/dev
+cs ssh -W temporal-orch/dev
 cd ~/multiagent-temporal/orchestrator
 bin/start-delivery "In checkoutservice, ..."         # prints the workflow ID and UI link
 bin/delivery-status deliver-1a2b3c4d --wait 5m       # returns when progress changes
@@ -67,4 +67,4 @@ cd orchestrator && go test ./...    # Temporal test environment; agents and harn
 ```
 
 To deploy changes, push them to this repository and re-run `./install.sh`. It pulls the
-latest code into `temporal-orchestrator`, rebuilds, and restarts the worker.
+latest code into `temporal-orch`, rebuilds, and restarts the worker.

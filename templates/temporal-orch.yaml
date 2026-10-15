@@ -1,4 +1,4 @@
-# temporal-orchestrator: the orchestrator sandbox for the temporal-engineering-manager agent.
+# temporal-orch: the orchestrator sandbox for the temporal-engineering-manager agent.
 #
 #   postgres        Temporal's database; workflow history survives suspend and resume
 #   temporal-admin  creates the Temporal schema and the default namespace

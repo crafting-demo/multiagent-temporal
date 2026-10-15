@@ -44,7 +44,7 @@ UUID, because only traffic tagged for the sandbox reaches its `checkoutservice`.
 
 ![Architecture](docs/architecture.png)
 
-The agent only starts and reports on the workflow. The worker in `temporal-orchestrator` runs each
+The agent only starts and reports on the workflow. The worker in `temporal-orch` runs each
 agent session as a Temporal activity, using `cs llm session run`.
 
 </details>
@@ -66,7 +66,7 @@ where it left off.
 | :-- | :-- |
 | `INSTALL.md`, `install.sh` | Install steps the default agent follows, and the script it runs |
 | `agents/temporal-engineering-manager.yaml` | The agent you talk to |
-| `templates/temporal-orchestrator.yaml` | The orchestrator sandbox: Temporal server, UI, Postgres, and a workspace that checks out this repo and runs the worker |
+| `templates/temporal-orch.yaml` | The orchestrator sandbox: Temporal server, UI, Postgres, and a workspace that checks out this repo and runs the worker |
 | `orchestrator/` | The Go workflow, activities, prompts, worker, and CLI; `AGENT.md` is the agent's runbook |
 | `docs/` | Diagrams and the [reference](docs/reference.md): CLI, options, signals, and development |
 
