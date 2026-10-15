@@ -1,0 +1,10 @@
+#!/bin/bash
+# Shows a delivery's progress. With --wait DURATION, blocks until the phase or
+# step list changes, or the delivery ends, before printing.
+#
+#   bin/delivery-status deliver-1a2b3c4d
+#   bin/delivery-status deliver-1a2b3c4d --wait 10m
+set -euo pipefail
+dir="$(cd "$(dirname "$0")/.." && pwd)"
+[ -x "$dir/bin/.build/deliveryctl" ] || "$dir/bin/setup" >/dev/null
+exec "$dir/bin/.build/deliveryctl" status "$@"

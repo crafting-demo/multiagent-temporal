@@ -1,0 +1,15 @@
+flowchart TD
+    Start(["Change request"]) --> Provision["Create a delivery sandbox from sample-boutique<br/>and take a baseline snapshot"]
+    Provision --> Code["Coder: sample-software-engineer<br/>implements the change"]
+    Code --> Local["Local QA: a fresh sample-qa-engineer session"]
+    Local -->|"PASS or SKIPPED"| Cluster["Cluster QA: a fresh sample-qa-engineer session<br/>through Kubernetes interception"]
+    Local -->|"FAIL"| Retry{"Attempts left?<br/>max 3"}
+    Cluster -->|"FAIL"| Retry
+    Retry -->|"yes: the QA report goes<br/>to a new coder session"| Code
+    Retry -->|"no"| Failed(["Failed"])
+    Cluster -->|"PASS"| Verified["Take a verified snapshot"]
+    Verified --> Passed(["Passed: the sandbox stays up for review"])
+
+    subgraph Anytime ["At any point"]
+        Signals["feedback signal: added to the next coder attempt<br/>cancel signal: stops the running agent session<br/>status query: phase, attempt, steps"]
+    end

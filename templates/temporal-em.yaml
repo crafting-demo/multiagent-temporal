@@ -1,0 +1,146 @@
+# temporal-em: the orchestrator sandbox for the temporal-engineering-manager agent.
+#
+#   postgres        Temporal's database; workflow history survives suspend and resume
+#   temporal-admin  creates the Temporal schema and the default namespace
+#   temporal        Temporal server, temporal:7233 inside the sandbox
+#   temporal-ui     Temporal Web UI, published as the temporal-ui endpoint
+#   dev             workspace with this repository checked out; its worker daemon
+#                   runs the DeliverChange workflow (see .sandbox/manifest.yaml)
+env:
+  - TEMPORAL_ADDRESS=temporal:7233
+  - TEMPORAL_NAMESPACE=default
+  - TEMPORAL_TASK_QUEUE=deliver-change
+
+endpoints:
+  - name: temporal-ui
+    http:
+      routes:
+        - path_prefix: /
+          backend:
+            target: temporal-ui
+            port: http
+
+volumes:
+  - name: pgdata
+  - name: temporal-dyncfg
+    content:
+      text: |
+        limit.maxIDLength:
+          - value: 255
+            constraints: {}
+        system.forceSearchAttributesCacheRefreshOnRead:
+          - value: true
+            constraints: {}
+
+containers:
+  - name: postgres
+    image: postgres:16
+    env:
+      - POSTGRES_USER=temporal
+      - POSTGRES_PASSWORD=temporal
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - name: pg
+        port: 5432
+        protocol: TCP
+    volume_mounts:
+      - name: pgdata
+        path: /var/lib/postgresql/data
+    probes:
+      readiness:
+        - name: pg-ready
+          tcp_port: 5432
+
+  # Crafting expands $NAME in container args; shell variables are written $$NAME.
+  - name: temporal-admin
+    image: temporalio/admin-tools:1.31.0
+    wait_for:
+      - postgres
+    env:
+      - POSTGRES_SEEDS=postgres
+      - SQL_PASSWORD=temporal
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_NAMESPACE=default
+    entrypoint: [sh, -c]
+    args:
+      - |
+        rm -f /tmp/schema-ready
+        until nc -z postgres 5432; do sleep 2; done
+        SQL="temporal-sql-tool --plugin postgres12 --ep postgres -p 5432 -u temporal --pw temporal"
+        SCHEMA=/etc/temporal/schema/postgresql/v12
+        for db in temporal temporal_visibility; do
+          $$SQL --db "$$db" create 2>/dev/null || true
+          $$SQL --db "$$db" setup-schema -v 0.0 2>/dev/null || true
+        done
+        $$SQL --db temporal update-schema -d "$$SCHEMA/temporal/versioned" || exit 1
+        $$SQL --db temporal_visibility update-schema -d "$$SCHEMA/visibility/versioned" || exit 1
+        touch /tmp/schema-ready
+        until temporal operator cluster health --address "$TEMPORAL_ADDRESS" >/dev/null 2>&1; do sleep 3; done
+        temporal operator namespace describe -n "$TEMPORAL_NAMESPACE" --address "$TEMPORAL_ADDRESS" >/dev/null 2>&1 \
+          || temporal operator namespace create -n "$TEMPORAL_NAMESPACE" --retention 72h --address "$TEMPORAL_ADDRESS"
+        trap exit INT HUP TERM
+        sleep infinity &
+        wait
+    probes:
+      readiness:
+        - name: schema-ready
+          command: test -f /tmp/schema-ready
+
+  - name: temporal
+    image: temporalio/server:1.31.0
+    wait_for:
+      - temporal-admin
+    # wait_for only applies at creation; on resume, wait for postgres here.
+    entrypoint: [sh, -c]
+    args:
+      - |
+        until nc -z postgres 5432; do sleep 2; done
+        exec /etc/temporal/entrypoint.sh
+    env:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_SEEDS=postgres
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - BIND_ON_IP=0.0.0.0
+      - DYNAMIC_CONFIG_FILE_PATH=/etc/temporal/dynamicconfig.yaml
+    volume_mounts:
+      - name: temporal-dyncfg
+        path: /etc/temporal/dynamicconfig.yaml
+    ports:
+      - name: grpc
+        port: 7233
+        protocol: GRPC/TCP
+    probes:
+      readiness:
+        - name: grpc-ready
+          tcp_port: 7233
+
+  - name: temporal-ui
+    image: temporalio/ui:2.49.1
+    wait_for:
+      - temporal
+    env:
+      - TEMPORAL_ADDRESS=temporal:7233
+    ports:
+      - name: http
+        port: 8080
+        protocol: HTTP/TCP
+
+workspaces:
+  - name: dev
+    wait_for:
+      - temporal
+    env:
+      - PATH=$HOME/.local/go/bin:$HOME/.local/bin:$PATH
+    checkouts:
+      - path: multiagent-temporal
+        repo:
+          git: https://github.com/crafting-demo/multiagent-temporal
+    # The agents work in other sandboxes, which idle detection here can't see,
+    # so a running workflow counts as activity.
+    probes:
+      activity:
+        - name: running-workflows
+          command: /home/owner/multiagent-temporal/orchestrator/bin/activity-probe
+          interval: 60s

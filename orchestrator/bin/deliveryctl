@@ -1,0 +1,6 @@
+#!/bin/bash
+# Full delivery CLI: start, status, result, feedback, cancel, teardown, list.
+set -euo pipefail
+dir="$(cd "$(dirname "$0")/.." && pwd)"
+[ -x "$dir/bin/.build/deliveryctl" ] || "$dir/bin/setup" >/dev/null
+exec "$dir/bin/.build/deliveryctl" "$@"

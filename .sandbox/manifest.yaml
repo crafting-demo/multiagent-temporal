@@ -1,0 +1,12 @@
+# Read by Crafting when the temporal-em template checks out this repository.
+hooks:
+  build:
+    cmd: orchestrator/bin/setup
+daemons:
+  worker:
+    run:
+      cmd: orchestrator/bin/start-worker
+commands:
+  start-delivery:
+    run:
+      cmd: orchestrator/bin/start-delivery

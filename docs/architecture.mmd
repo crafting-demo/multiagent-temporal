@@ -1,0 +1,22 @@
+flowchart TB
+    User(["You, in the Agent UI"]) --> TEM["temporal-engineering-manager<br/>agent"]
+    TEM -->|"starts DeliverChange,<br/>reports progress"| WF
+
+    subgraph orch ["temporal-em sandbox (pinned)"]
+        WF["DeliverChange workflow<br/>Go worker"]
+        Srv[("Temporal server<br/>UI + Postgres")]
+        WF --- Srv
+    end
+
+    WF -->|"cs llm session run"| SWE["sample-software-engineer"]
+    WF -->|"cs llm session run"| QA["sample-qa-engineer<br/>local + cluster pass"]
+    WF -->|"create, snapshot"| Target
+
+    subgraph tgt ["Delivery sandbox, from sample-boutique"]
+        Target["boutique code<br/>checkoutservice daemon"]
+    end
+
+    SWE -->|"edits"| Target
+    QA -->|"tests"| Target
+    QA -->|"intercept plan: checkout"| Cluster["Kubernetes cluster<br/>boutique app"]
+    Cluster -.->|"tagged checkout traffic"| Target

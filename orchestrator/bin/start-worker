@@ -1,0 +1,6 @@
+#!/bin/bash
+# Runs the DeliverChange worker in the foreground; started by the worker daemon.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+[ -x bin/.build/worker ] || bin/setup
+exec bin/.build/worker

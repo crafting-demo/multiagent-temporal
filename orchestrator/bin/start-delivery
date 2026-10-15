@@ -1,0 +1,10 @@
+#!/bin/bash
+# Starts a DeliverChange workflow and prints its workflow ID and Temporal UI link.
+#
+#   bin/start-delivery "Change the shipping cost to ..."
+#   bin/start-delivery --request-file request.md --max-attempts 2
+#   bin/start-delivery --intercept-plan none --skip-local "..."
+set -euo pipefail
+dir="$(cd "$(dirname "$0")/.." && pwd)"
+[ -x "$dir/bin/.build/deliveryctl" ] || "$dir/bin/setup" >/dev/null
+exec "$dir/bin/.build/deliveryctl" start "$@"

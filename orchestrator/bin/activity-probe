@@ -1,0 +1,8 @@
+#!/bin/bash
+# Sandbox activity probe: succeeds while any workflow is running, so the
+# orchestrator stays awake while agents work in other sandboxes.
+export PATH="$HOME/.local/bin:$PATH"
+n="$(temporal workflow count --address "${TEMPORAL_ADDRESS:-temporal:7233}" \
+  --namespace "${TEMPORAL_NAMESPACE:-default}" \
+  --query 'ExecutionStatus="Running"' 2>/dev/null | grep -oE '[0-9]+' | head -1)"
+[ "${n:-0}" -gt 0 ]
